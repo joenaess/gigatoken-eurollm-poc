@@ -1,0 +1,435 @@
+{
+  "tokenizer": "openeurollm/tokenizer-256k-v2",
+  "baseline": "hf_fast",
+  "config": {
+    "iterations": 3,
+    "warmup": 1,
+    "payloads": {
+      "all": {
+        "bytes": 50005403,
+        "documents": 23908
+      },
+      "prose": {
+        "bytes": 35001282,
+        "documents": 15338
+      },
+      "code": {
+        "bytes": 7501562,
+        "documents": 1106
+      },
+      "chat": {
+        "bytes": 5001989,
+        "documents": 2417
+      },
+      "math": {
+        "bytes": 2500570,
+        "documents": 5047
+      }
+    },
+    "timer": "time.perf_counter, min over iterations",
+    "size_mb": 50.0,
+    "seed": 0
+  },
+  "environment": {
+    "cpu_model": "13th Gen Intel(R) Core(TM) i9-13980HX",
+    "physical_cores": 24,
+    "logical_threads": 32,
+    "ram_gb": 31.0,
+    "os": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "packages": {
+      "gigatoken": "0.10.0",
+      "tokenizers": "0.23.3",
+      "transformers": "5.19.0",
+      "sentencepiece": "0.2.2",
+      "numpy": "2.5.4"
+    },
+    "thread_env": {
+      "RAYON_NUM_THREADS": null,
+      "TOKENIZERS_PARALLELISM": null
+    },
+    "timestamp_utc": "2026-10-14T09:03:40Z"
+  },
+  "runs": [
+    {
+      "engine": "hf_fast",
+      "label": "HF Fast (encode_batch)",
+      "payload": "all",
+      "nbytes": 50005403,
+      "ndocs": 23908,
+      "ntokens": 10346407,
+      "times_s": [
+        0.4646432769950479,
+        0.44827751797856763,
+        0.4558434839709662
+      ],
+      "min_s": 0.44827751797856763,
+      "mean_s": 0.4562547596481939,
+      "std_s": 0.008190627436795418,
+      "mb_per_s": 111.55010232387069,
+      "mtok_per_s": 23.08036112686487,
+      "speedup_vs_baseline": 1.0
+    },
+    {
+      "engine": "hf_fast_no_offsets",
+      "label": "HF Fast (encode_batch_fast)",
+      "payload": "all",
+      "nbytes": 50005403,
+      "ndocs": 23908,
+      "ntokens": 10346407,
+      "times_s": [
+        0.3782778650056571,
+        0.39287105097901076,
+        0.3854176920140162
+      ],
+      "min_s": 0.3782778650056571,
+      "mean_s": 0.385522202666228,
+      "std_s": 0.0072971543131922995,
+      "mb_per_s": 132.19225237842605,
+      "mtok_per_s": 27.351341321135116,
+      "speedup_vs_baseline": 1.185048239531181
+    },
+    {
+      "engine": "gt_compat",
+      "label": "Gigatoken HF compat",
+      "payload": "all",
+      "nbytes": 50005403,
+      "ndocs": 23908,
+      "ntokens": 10346407,
+      "times_s": [
+        0.1680915869656019,
+        0.1802219139644876,
+        0.16548566200071946
+      ],
+      "min_s": 0.16548566200071946,
+      "mean_s": 0.171266387643603,
+      "std_s": 0.007864400803220317,
+      "mb_per_s": 302.17362879318574,
+      "mtok_per_s": 62.52147089307965,
+      "speedup_vs_baseline": 2.708860166850097
+    },
+    {
+      "engine": "gt_native",
+      "label": "Gigatoken native (encode_files)",
+      "payload": "all",
+      "nbytes": 50005403,
+      "ndocs": 23908,
+      "ntokens": 10346407,
+      "times_s": [
+        0.054481485043652356,
+        0.049813050020020455,
+        0.05206633801572025
+      ],
+      "min_s": 0.049813050020020455,
+      "mean_s": 0.05212029102646435,
+      "std_s": 0.0023346851153837663,
+      "mb_per_s": 1003.8614977380875,
+      "mtok_per_s": 207.70474796949105,
+      "speedup_vs_baseline": 8.999198358630913
+    },
+    {
+      "engine": "hf_fast",
+      "label": "HF Fast (encode_batch)",
+      "payload": "prose",
+      "nbytes": 35001282,
+      "ndocs": 15338,
+      "ntokens": 6431191,
+      "times_s": [
+        0.2972462790203281,
+        0.29824017599457875,
+        0.3026826790301129
+      ],
+      "min_s": 0.2972462790203281,
+      "mean_s": 0.2993897113483399,
+      "std_s": 0.0028947685423462237,
+      "mb_per_s": 117.7517919327977,
+      "mtok_per_s": 21.635900779636618,
+      "speedup_vs_baseline": 1.0
+    },
+    {
+      "engine": "hf_fast_no_offsets",
+      "label": "HF Fast (encode_batch_fast)",
+      "payload": "prose",
+      "nbytes": 35001282,
+      "ndocs": 15338,
+      "ntokens": 6431191,
+      "times_s": [
+        0.23349432897521183,
+        0.23330499598523602,
+        0.23318221501540393
+      ],
+      "min_s": 0.23318221501540393,
+      "mean_s": 0.2333271799919506,
+      "std_s": 0.00015723510610603602,
+      "mb_per_s": 150.10270829483215,
+      "mtok_per_s": 27.58010939888858,
+      "speedup_vs_baseline": 1.2747382084894086
+    },
+    {
+      "engine": "gt_compat",
+      "label": "Gigatoken HF compat",
+      "payload": "prose",
+      "nbytes": 35001282,
+      "ndocs": 15338,
+      "ntokens": 6431191,
+      "times_s": [
+        0.10261114302556962,
+        0.09884176997002214,
+        0.101074411009904
+      ],
+      "min_s": 0.09884176997002214,
+      "mean_s": 0.10084244133516525,
+      "std_s": 0.001895362961406239,
+      "mb_per_s": 354.11427790716,
+      "mtok_per_s": 65.06551837295635,
+      "speedup_vs_baseline": 3.007294174421202
+    },
+    {
+      "engine": "gt_native",
+      "label": "Gigatoken native (encode_files)",
+      "payload": "prose",
+      "nbytes": 35001282,
+      "ndocs": 15338,
+      "ntokens": 6431191,
+      "times_s": [
+        0.033097039035055786,
+        0.03141114400932565,
+        0.032234031008556485
+      ],
+      "min_s": 0.03141114400932565,
+      "mean_s": 0.03224740468431264,
+      "std_s": 0.0008430270759873758,
+      "mb_per_s": 1114.295040944974,
+      "mtok_per_s": 204.74233597129236,
+      "speedup_vs_baseline": 9.463083513675231
+    },
+    {
+      "engine": "hf_fast",
+      "label": "HF Fast (encode_batch)",
+      "payload": "code",
+      "nbytes": 7501562,
+      "ndocs": 1106,
+      "ntokens": 1809014,
+      "times_s": [
+        0.12691210297634825,
+        0.13269072497496381,
+        0.13050898304209113
+      ],
+      "min_s": 0.12691210297634825,
+      "mean_s": 0.1300372703311344,
+      "std_s": 0.0029180477569737515,
+      "mb_per_s": 59.10832634613276,
+      "mtok_per_s": 14.254070002583864,
+      "speedup_vs_baseline": 1.0
+    },
+    {
+      "engine": "hf_fast_no_offsets",
+      "label": "HF Fast (encode_batch_fast)",
+      "payload": "code",
+      "nbytes": 7501562,
+      "ndocs": 1106,
+      "ntokens": 1809014,
+      "times_s": [
+        0.10044275899417698,
+        0.10280024301027879,
+        0.10167507000733167
+      ],
+      "min_s": 0.10044275899417698,
+      "mean_s": 0.10163935733726248,
+      "std_s": 0.0011791476869529448,
+      "mb_per_s": 74.68494568568045,
+      "mtok_per_s": 18.010397345864174,
+      "speedup_vs_baseline": 1.2635266518685113
+    },
+    {
+      "engine": "gt_compat",
+      "label": "Gigatoken HF compat",
+      "payload": "code",
+      "nbytes": 7501562,
+      "ndocs": 1106,
+      "ntokens": 1809014,
+      "times_s": [
+        0.026530809001997113,
+        0.025319777021650225,
+        0.025088333000894636
+      ],
+      "min_s": 0.025088333000894636,
+      "mean_s": 0.02564630634151399,
+      "std_s": 0.0007746936820364349,
+      "mb_per_s": 299.0059961230783,
+      "mtok_per_s": 72.10578717746976,
+      "speedup_vs_baseline": 5.058610429470249
+    },
+    {
+      "engine": "gt_native",
+      "label": "Gigatoken native (encode_files)",
+      "payload": "code",
+      "nbytes": 7501562,
+      "ndocs": 1106,
+      "ntokens": 1809014,
+      "times_s": [
+        0.014972124015912414,
+        0.011966802994720638,
+        0.016279718023724854
+      ],
+      "min_s": 0.011966802994720638,
+      "mean_s": 0.014406215011452636,
+      "std_s": 0.0022114472100525262,
+      "mb_per_s": 626.8643348862219,
+      "mtok_per_s": 151.1693641817349,
+      "speedup_vs_baseline": 10.605347395819729
+    },
+    {
+      "engine": "hf_fast",
+      "label": "HF Fast (encode_batch)",
+      "payload": "chat",
+      "nbytes": 5001989,
+      "ndocs": 2417,
+      "ntokens": 916164,
+      "times_s": [
+        0.049861112027429044,
+        0.04866581200622022,
+        0.047814911988098174
+      ],
+      "min_s": 0.047814911988098174,
+      "mean_s": 0.04878061200724915,
+      "std_s": 0.0010279192236827728,
+      "mb_per_s": 104.6114860829414,
+      "mtok_per_s": 19.160633407169012,
+      "speedup_vs_baseline": 1.0
+    },
+    {
+      "engine": "hf_fast_no_offsets",
+      "label": "HF Fast (encode_batch_fast)",
+      "payload": "chat",
+      "nbytes": 5001989,
+      "ndocs": 2417,
+      "ntokens": 916164,
+      "times_s": [
+        0.040220124006737024,
+        0.03705982503015548,
+        0.03801413101609796
+      ],
+      "min_s": 0.03705982503015548,
+      "mean_s": 0.038431360017663486,
+      "std_s": 0.0016209356665691924,
+      "mb_per_s": 134.97065881800293,
+      "mtok_per_s": 24.72121763269308,
+      "speedup_vs_baseline": 1.2902087894152579
+    },
+    {
+      "engine": "gt_compat",
+      "label": "Gigatoken HF compat",
+      "payload": "chat",
+      "nbytes": 5001989,
+      "ndocs": 2417,
+      "ntokens": 916164,
+      "times_s": [
+        0.013877729012165219,
+        0.013724313990678638,
+        0.013497898995410651
+      ],
+      "min_s": 0.013497898995410651,
+      "mean_s": 0.013699980666084835,
+      "std_s": 0.0001910805940468165,
+      "mb_per_s": 370.57537633825086,
+      "mtok_per_s": 67.87456331622425,
+      "speedup_vs_baseline": 3.54239663553235
+    },
+    {
+      "engine": "gt_native",
+      "label": "Gigatoken native (encode_files)",
+      "payload": "chat",
+      "nbytes": 5001989,
+      "ndocs": 2417,
+      "ntokens": 916164,
+      "times_s": [
+        0.008261292008683085,
+        0.00811607897048816,
+        0.008900413988158107
+      ],
+      "min_s": 0.00811607897048816,
+      "mean_s": 0.008425928322443118,
+      "std_s": 0.0004172819093157496,
+      "mb_per_s": 616.3061027607453,
+      "mtok_per_s": 112.88258817236411,
+      "speedup_vs_baseline": 5.891380820955988
+    },
+    {
+      "engine": "hf_fast",
+      "label": "HF Fast (encode_batch)",
+      "payload": "math",
+      "nbytes": 2500570,
+      "ndocs": 5047,
+      "ntokens": 1190038,
+      "times_s": [
+        0.03103385301074013,
+        0.030956270988099277,
+        0.031015404034405947
+      ],
+      "min_s": 0.030956270988099277,
+      "mean_s": 0.031001842677748453,
+      "std_s": 4.052993159450606e-05,
+      "mb_per_s": 80.77749419370669,
+      "mtok_per_s": 38.442550152681314,
+      "speedup_vs_baseline": 1.0
+    },
+    {
+      "engine": "hf_fast_no_offsets",
+      "label": "HF Fast (encode_batch_fast)",
+      "payload": "math",
+      "nbytes": 2500570,
+      "ndocs": 5047,
+      "ntokens": 1190038,
+      "times_s": [
+        0.022280800971202552,
+        0.02306037599919364,
+        0.02279106801142916
+      ],
+      "min_s": 0.022280800971202552,
+      "mean_s": 0.022710748327275116,
+      "std_s": 0.0003959453810991861,
+      "mb_per_s": 112.22980732299222,
+      "mtok_per_s": 53.41091648985591,
+      "speedup_vs_baseline": 1.3893697550689303
+    },
+    {
+      "engine": "gt_compat",
+      "label": "Gigatoken HF compat",
+      "payload": "math",
+      "nbytes": 2500570,
+      "ndocs": 5047,
+      "ntokens": 1190038,
+      "times_s": [
+        0.023800316033884883,
+        0.024543877982068807,
+        0.02361135301180184
+      ],
+      "min_s": 0.02361135301180184,
+      "mean_s": 0.023985182342585176,
+      "std_s": 0.0004929831326852943,
+      "mb_per_s": 105.90540909494351,
+      "mtok_per_s": 50.40109304219772,
+      "speedup_vs_baseline": 1.3110756919616666
+    },
+    {
+      "engine": "gt_native",
+      "label": "Gigatoken native (encode_files)",
+      "payload": "math",
+      "nbytes": 2500570,
+      "ndocs": 5047,
+      "ntokens": 1190038,
+      "times_s": [
+        0.01718664896907285,
+        0.016052374034188688,
+        0.015857917023822665
+      ],
+      "min_s": 0.015857917023822665,
+      "mean_s": 0.016365646675694734,
+      "std_s": 0.0007176259168391397,
+      "mb_per_s": 157.68590516922882,
+      "mtok_per_s": 75.04377770499474,
+      "speedup_vs_baseline": 1.9521019653208556
+    }
+  ]
+}
