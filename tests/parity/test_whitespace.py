@@ -82,3 +82,15 @@ def test_whitespace_inventory_is_derived(inventory):
     pieces = {piece_to_text(p) for _, p in inventory.whitespace_pieces}
     assert {" " * 2, " " * 4, " " * 8, " " * 16} <= pieces
     assert {"\t", "\r\n", "\t\n", "\n\n\n"} <= {t.content for t in inventory.whitespace_added}
+
+
+_LITERAL = _inv.literal_space_pieces
+
+
+@pytest.mark.parametrize("piece_id,piece", _LITERAL, ids=[repr(p) for _, p in _LITERAL])
+def test_literal_space_pieces_are_never_emitted(encoders, piece_id, piece):
+    """Pieces spelled with U+0020 are unreachable: spaces become ``▁`` before BPE."""
+    for text in (piece, f"x{piece}y", f"def f():\n{piece}return 1\n"):
+        results = encoders.encode_all(text)
+        assert len({tuple(ids) for ids in results.values()}) == 1, results
+        assert piece_id not in results["hf_raw"]

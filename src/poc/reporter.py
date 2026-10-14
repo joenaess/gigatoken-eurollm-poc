@@ -193,16 +193,27 @@ def parity_markdown(
                     ["SentencePiece BYTE pieces", s["sp_byte"], ""],
                     ["Whitespace-only added tokens", s["whitespace_added_tokens"], ""],
                     ["Whitespace-only BPE pieces", s["whitespace_vocab_pieces"], ""],
+                    ["Whitespace tokens total", s["whitespace_total"], ""],
                     [
-                        "Whitespace tokens total",
-                        s["whitespace_total"],
+                        "  added + literal-space pieces",
+                        s["whitespace_added_tokens"] + s["whitespace_literal_space_pieces"],
                         f"~{RELEASE_NOTES['whitespace_tokens']}",
+                    ],
+                    [
+                        "  reachable when encoding text",
+                        s["whitespace_reachable"],
+                        "",
                     ],
                 ],
                 headers=["Quantity", "Derived", "Release notes"],
                 tablefmt="github",
                 disable_numparse=True,
             ),
+            "",
+            f"The {s['whitespace_literal_space_pieces']} literal-space pieces (runs of U+0020, "
+            "e.g. 2–32 spaces) are never emitted: spaces are escaped to `▁` before BPE, so "
+            "indentation is encoded with `▁`-run pieces instead. Every encoding path agrees on "
+            "this (see `test_literal_space_pieces_are_never_emitted`).",
             "",
         ]
     return "\n".join(lines)

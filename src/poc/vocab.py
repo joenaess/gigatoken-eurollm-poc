@@ -48,6 +48,15 @@ class VocabInventory:
     def whitespace_total(self) -> int:
         return len(self.whitespace_added) + len(self.whitespace_pieces)
 
+    @property
+    def literal_space_pieces(self) -> tuple[tuple[int, str], ...]:
+        """Whitespace pieces spelled with a literal U+0020 instead of ``▁``.
+
+        Spaces are escaped to ``▁`` before BPE (Metaspace / SentencePiece whitespace
+        escaping, no normalizer), so these pieces cannot be produced by encoding text.
+        """
+        return tuple((i, p) for i, p in self.whitespace_pieces if " " in p)
+
     def summary(self) -> dict[str, int]:
         return {
             "vocab_size": self.vocab_size,
@@ -60,6 +69,8 @@ class VocabInventory:
             "whitespace_added_tokens": len(self.whitespace_added),
             "whitespace_vocab_pieces": len(self.whitespace_pieces),
             "whitespace_total": self.whitespace_total,
+            "whitespace_literal_space_pieces": len(self.literal_space_pieces),
+            "whitespace_reachable": self.whitespace_total - len(self.literal_space_pieces),
         }
 
 

@@ -128,6 +128,8 @@ def test_parity_report_with_inventory(tmp_path):
                 "whitespace_added_tokens": 1,
                 "whitespace_vocab_pieces": 2,
                 "whitespace_total": 3,
+                "whitespace_literal_space_pieces": 1,
+                "whitespace_reachable": 2,
             }
 
     path = write_parity_report(tmp_path / "p.md", {"x": {"passed": 1}}, inventory=Inv())
