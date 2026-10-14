@@ -1,0 +1,16 @@
+# Python / tooling
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.benchmarks/
+build/
+dist/
+*.egg-info/
+
+# Generated data — never commit corpora or model caches
+data/
+*.jsonl
+corpus*.txt
+.env

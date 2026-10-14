@@ -1,0 +1,48 @@
+[project]
+name = "gigatoken-eurollm-poc"
+version = "0.1.0"
+description = "Tokenizer parity and throughput benchmark: Hugging Face tokenizers vs gigatoken on OpenEuroLLM tokenizer-256k-v2"
+readme = "README.md"
+license = "MIT"
+authors = [
+    { name = "Jonas Lind", email = "jonas.lind@ai.se" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "gigatoken>=0.10.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.4.6",
+    "protobuf>=7.36.2",
+    "sentencepiece>=0.2.2",
+    "tabulate>=0.10.0",
+    "tokenizers>=0.23.3",
+    "transformers>=5.19.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/poc"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "parity: real-tokenizer parity tests (download openeurollm/tokenizer-256k-v2)",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-benchmark>=5.3.0",
+    "ruff>=0.17.0",
+]
