@@ -57,7 +57,7 @@ def _style(ax: Axes, value_axis: str) -> None:
     ax.set_axisbelow(True)
 
 
-def _footnote(fig: Figure, results: Mapping[str, Any]) -> None:
+def _footnote(ax: Axes, results: Mapping[str, Any], *, below_pt: float = 44) -> None:
     cfg = results["config"]
     mb = cfg["payloads"][OVERALL]["bytes"] / 1e6
     text = (
@@ -65,7 +65,17 @@ def _footnote(fig: Figure, results: Mapping[str, Any]) -> None:
         f"best of {cfg['iterations']} timed runs after {cfg['warmup']} warmup · "
         f"tokenizer {results['tokenizer']}"
     )
-    fig.text(0.01, -0.05, text, ha="left", va="top", fontsize=7.5, color=INK_MUTED)
+    # Anchored below the axes in points so it clears the axis label (and legend) at any size.
+    ax.annotate(
+        text,
+        xy=(0, 0),
+        xycoords="axes fraction",
+        xytext=(0, -below_pt),
+        textcoords="offset points",
+        va="top",
+        fontsize=7.5,
+        color=INK_MUTED,
+    )
 
 
 def _new_figure(width: float = 8.0, height: float = 3.6) -> tuple[Figure, Axes]:
@@ -134,7 +144,7 @@ def _engine_bars(
     ax.set_xlim(0, vmax * 1.18)
     ax.set_xlabel(xlabel, color=INK_SECONDARY)
     _title(ax, title, subtitle)
-    _footnote(fig, results)
+    _footnote(ax, results)
     return _save(fig, path)
 
 
@@ -201,9 +211,9 @@ def plot_throughput_by_domain(results: Mapping[str, Any], path: Path) -> Path:
     ax.set_ylim(0, vmax * 1.15)
     ax.set_ylabel("Throughput (MB/s)", color=INK_SECONDARY)
     ax.set_xlabel("Corpus domain", color=INK_SECONDARY)
-    ax.legend(frameon=False, fontsize=8, ncols=min(n, 4), loc="upper left", bbox_to_anchor=(0, 1.0))
+    ax.legend(frameon=False, fontsize=8, ncols=2, loc="upper left", bbox_to_anchor=(0, -0.16))
     _title(ax, "Throughput by domain (MB/s)", "Each domain benchmarked separately")
-    _footnote(fig, results)
+    _footnote(ax, results, below_pt=92)
     return _save(fig, path)
 
 
