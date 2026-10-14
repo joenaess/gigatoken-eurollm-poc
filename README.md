@@ -151,6 +151,80 @@ from `tokenizer.json` and `tokenizer.model` ([`src/poc/vocab.py`](src/poc/vocab.
   literal-space pieces. All engines agree, so this is a property of the tokenizer, not a
   parity issue, but it may not be what the v2 changes intended.
 
+## Conclusion
+
+### Speed
+
+On this tokenizer, gigatoken is **9× faster** than `tokenizers.encode_batch` through its native
+API (about 1 GB/s) and **2.7× faster** as a drop-in replacement behind the transformers API. The
+speedup holds in every domain: it is largest on indented code (10.6×) and smallest on
+digit-heavy math (2×). These numbers are consistent with gigatoken's own published benchmarks, which put
+SentencePiece-BPE tokenizers (Gemma, Mistral, Llama 2) at roughly 7–21× over HF, and describe
+that tokenizer family as "not well optimized in Gigatoken" compared with byte-level BPE
+tokenizers, where it reports 100–1000×.
+
+### Where the speed comes from
+
+I measured three effects in this repo, on the same 50 MB corpus unless noted:
+
+| Observation | Measurement | What it shows |
+|---|---|---|
+| **Per-core efficiency** | Single thread (`RAYON_NUM_THREADS=1`, 10.5 MB subset): gigatoken 160.7 MB/s vs HF 7.4 MB/s, about **22×** | Most of the gain is in the encoder itself, not in using more threads. HF needs 32 threads (98.5 MB/s) to come within 2× of gigatoken on one. |
+| **Input path barely matters** | Native `encode_files` (file) 1013 MB/s, `encode_batch(BytesSource)` 1054 MB/s, `encode_batch(list[str])` 1032 MB/s | The native-API speed is also available for in-memory data. File reading is not the bottleneck. |
+| **Python output dominates the compat path** | Native output (awkward `uint32`) about 1030 MB/s, vs. the same encoder returning `list[list[int]]` (`encode_batch_list`) 298 MB/s, compat `__call__` 298 MB/s, and compat with `attention_mask` 263 MB/s | The drop from 9× to 2.7× is almost entirely the cost of creating about 10M Python `int` objects. Compat adds no measurable overhead beyond that, and attention masks cost about 12% more. |
+
+For the internals, gigatoken's author attributes the speed to SIMD pretokenization that replaces
+the regex engine, aggressive caching of pretoken→token mappings, minimal Python interaction, and
+avoiding cross-thread communication. I did not profile the Rust internals to confirm this. One
+inference worth noting: this tokenizer's pretokenizer is a non-splitting `Metaspace` with no
+regex. So the regex-replacement gain the author emphasises probably contributes little here,
+which would explain why SentencePiece models see smaller speedups than byte-level BPE ones.
+
+### Correctness
+
+Across the 605 asserted cases plus every document of a multi-domain corpus sample, I found
+**no token-ID difference** between gigatoken (compat or native) and Hugging Face. Coverage
+includes all 176 added tokens, whitespace and indentation runs, ChatML/FIM/StarCoder markers,
+the v2 scripts, byte fallback and Unicode normalisation variants. The only divergence in the
+suite is raw SentencePiece treating `<unk>`/`<bos>`/`<eos>`/`<pad>` as plain text, which is
+documented SentencePiece behaviour, not a gigatoken issue. This is strong evidence of parity
+for this tokenizer and gigatoken version, not a proof. The cases are synthetic or hand-written,
+and the result says nothing about other tokenizers or future releases.
+
+### Should you use it?
+
+**Yes, for bulk preprocessing.** Tokenizing pretraining corpora into token shards is the ideal
+case. Use the native API (`encode_files` or `encode_batch`) and keep the awkward/NumPy output
+instead of converting to Python lists. You get about 9× more throughput on a laptop CPU with
+identical IDs, and the gain grows with core count.
+
+**Yes, as a drop-in where tokenization is a bottleneck.** `gt.Tokenizer(hf_tok).as_hf()` is a
+one-line change for code that calls the tokenizer on batches and only needs `input_ids` and
+`attention_mask`. That gives about 2.7× here, and `return_tensors="np"`/`"pt"` avoids most of the list
+overhead.
+
+**No, or not yet, when:**
+
+- **You need offsets.** `return_offsets_mapping=True` is **silently ignored**: there is no
+  `offset_mapping` key and no error, although the class docstring says unsupported options
+  raise. Token/character alignment code (NER, QA span extraction) would break silently. Keep
+  HF for these pipelines.
+- **You use sequence pairs or pre-tokenized input** (`text_pair`, `is_split_into_words`). Both
+  raise `ValueError`/`NotImplementedError`. Truncation also requires an explicit `max_length`.
+- **You depend on HF `Encoding` objects** (word IDs, offsets, overflow), or call
+  `encode_batch` on the compat object. That method doesn't exist, even though gigatoken's own
+  README shows it.
+- **Tokenization is not your bottleneck.** HF already processes 50 MB in 0.45 s here. For
+  fine-tuning sets or online serving of single requests, the gain may not justify a new
+  dependency. Single-request latency was not measured.
+- **You can't pin and re-verify.** gigatoken is pre-1.0 (0.10.0), and its README and API already
+  differ. If you adopt it, pin the version and run a parity suite like this repo's as a gate
+  on every upgrade.
+
+**Recommendation for OpenEuroLLM:** use gigatoken's native API for corpus tokenization with a
+pinned version and this parity suite in CI. Use the compat wrapper in `input_ids`-only data
+loaders. Keep Hugging Face `tokenizers` wherever offsets, pairs or `Encoding` objects are needed.
+
 ## Environment
 
 | | |
@@ -232,7 +306,8 @@ These were checked against the installed `gigatoken` 0.10.0 source.
 
 | Spec assumption | Actual API | What this repo does |
 |---|---|---|
-| `gt.Tokenizer(hf_tok).as_hf().encode_batch(...)` | `HFCompat` mirrors the transformers tokenizer API and **has no `encode_batch`**. Batches go through `__call__(list[str])` | `compat(texts, add_special_tokens=False, return_attention_mask=False)["input_ids"]` |
+| `gt.Tokenizer(hf_tok).as_hf().encode_batch(...)` (also shown in gigatoken's own README) | `HFCompat` mirrors the transformers tokenizer API and **has no `encode_batch`** (`AttributeError`). Batches go through `__call__(list[str])` | `compat(texts, add_special_tokens=False, return_attention_mask=False)["input_ids"]` |
+| Drop-in for the transformers `__call__` | `return_offsets_mapping=True` is **silently ignored** (no `offset_mapping` key). Sequence pairs and `is_split_into_words` raise | Only `input_ids` are used here. See [Should you use it?](#should-you-use-it) |
 | `gt.Tokenizer("openeurollm/tokenizer-256k-v2")` | Works as documented: downloads `tokenizer.json` directly and picks the `SentencePieceBPE` backend | Used as-is |
 | `encode_files(gt.TextFileSource(...))` | `TextFileSource(paths: list, separator: str \| bytes \| None)`. Without a separator, each file is one document | Pass a list of paths and the `<\|endoftext\|>\n` separator |
 | `gt.JsonlFileSource(...)` | `JsonlFileSource(paths: list, field="text")` | JSONL is exported but not benchmarked (the text path is used) |
