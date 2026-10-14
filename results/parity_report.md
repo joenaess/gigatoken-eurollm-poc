@@ -2,7 +2,7 @@
 
 **Status: PASS** — every case asserts identical token IDs across `hf_auto`, `hf_raw`, `sp`, `gt_compat`, `gt_native`.
 
-Generated 2026-10-14 09:04 UTC by `pytest -q`.
+Generated 2026-10-14 09:06 UTC by `pytest -q`.
 
 | Category   | Cases   | passed   | failed   | xfailed   | xpassed   | skipped   |
 |------------|---------|----------|----------|-----------|-----------|-----------|
