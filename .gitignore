@@ -14,3 +14,24 @@ data/
 *.jsonl
 corpus*.txt
 .env
+
+# Claude Code / agent instructions and local settings
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# Editors & OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Other tooling caches & local artifacts
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.log
+.env.*
